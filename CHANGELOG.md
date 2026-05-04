@@ -1,5 +1,24 @@
 ## Changelog
 
+### 2026-05-04 (branch: `modernize-2026`)
+
+Toolkit modernization for current Google Colab (Python 3.12 / CUDA 12.8 / Ubuntu 22.04).
+
+Updated dependency versions:
+
+* **GROMACS:** `2023.2` → **`2026.1`**, with new CMake flags (`GMX_CUDA_TARGET_SM=75;80;86;89;90`, PTX `90`, AVX2_256) covering Colab's T4/A100/L4/H100 GPUs
+* **CHARMM36 forcefield:** `jul2022` → **`feb2026_cgenff-5.0`** (Lemkul Lab default; CGenFF 5.0 parameters)
+* **`cgenff_charmm2gmx.py`:** the legacy `py3_nx2` script (Python ≤3.8) is replaced by the [Lemkul-Lab repository](https://github.com/Lemkul-Lab/cgenff_charmm2gmx) version (Python 3.11+), pinned to commit `f71070b0` (first commit supporting CGenFF 4.6 and 5.0 concurrently)
+* **CGenFF `.str` header format updated** from `"For use with CGenFF version X.Y"` to `"For use with CGenFF topology and parameter files version X.Y"` to match the new script's parser
+
+Architecture change:
+
+* **Removed Miniconda dependency entirely.** Previously two conda environments (`charmm2gmx` for Python ≤3.8, and `biopython` for Open Babel) were required. With the new `cgenff_charmm2gmx.py` working on Python 3.11+, the Colab system Python (3.12) is sufficient. Open Babel CLI is now installed via `apt-get install openbabel`; Biopython / NetworkX / NumPy via `pip install`. This eliminates the ~200MB Miniconda Drive cache and several minutes of conda env setup time.
+
+Recommended runtime:
+
+* Build notebook now recommends **L4 GPU + High-RAM** instead of "CPU only / Standard RAM" — the build needs CUDA toolkit and benefits from more cores/memory.
+
 ### 2023-10-06
 
 New features:
